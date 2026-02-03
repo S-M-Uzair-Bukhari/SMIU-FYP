@@ -13,7 +13,7 @@ const middleware = require('../middleware/auth');
 router.post('/login', controllers.login);
 router.get('/userProfile', middleware.verifyUser, controllers.getProfile);
 router.post('/updateImage', middleware.verifyUser, middleware.upload.single('image'), controllers.updateImage);
-router.post('/updateUser', middleware.verifyUser, controllers.updateUser);
+router.post('/updateUser', middleware.verifyUser, middleware.upload.single('image'),controllers.updateUser);
 router.post('/forgetPassword', controllers.forgetPassword);
 router.post('/updatePassword', controllers.updatePassword);
 

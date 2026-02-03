@@ -71,10 +71,10 @@ const login = async (req, res) => {
         return res.status(200).json({
             msg: "user is Successfully Loggedin",
             data: {
-                name: user.firstName + user.lastName,
-                email: user.email,
                 id: user._id,
-                ImagePath: user.imagePath
+                email: user.email,
+                name: user.firstName + user.lastName,
+                imagePath: user.image ? user.image : null
             }, acessToken: token, refreshToken
 
         });
@@ -163,11 +163,10 @@ const updatePassword = async (req, res) => {
 
 const updateImage = async (req, res) => {
     try {
-        console.log('user Id:', req.body.id);
-        // const { path, fieldname }= req.file;
         if (!req.file) {
             return res.status(400).json({ msg: 'Please Upload an Image' });
         }
+        
         const user = await functions.updateImage(req);
         return res.status(200).json({
             msg: "Image is Successfully Uploaded:",
@@ -175,7 +174,7 @@ const updateImage = async (req, res) => {
                 _id: user._id,
                 name: user.firstName +" "+user.lastName,
                 email: user.email,
-                imagePath: user.imagePath
+                imagePath: user.image
             }
         });
     } catch (error) {
@@ -187,14 +186,20 @@ const updateImage = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const id = req.body.id;
+        const id = req.user._id;
         const updatedData = req.body;
+        console.log('[IMAGE]', req.file)
+        if(req.file){
+            updatedData.image = req.file.url;
+        }
         let user = await functions.updateUser(id, updatedData);
         return res.status(200).json({
             msg: 'User Profile is Successfully Updated:', data: {
                 _id: user._id,
                 name: user.firstName + user.lastName,
                 email: user.email,
+                phNumber: user.phNumber,
+                imagePath: user.image
             }
         });
     } catch (error) {

@@ -16,7 +16,7 @@ app.use('/',
 );
 
 app.get('/', (req, res)=>{
-    res.send('Welcome to Backend-Fuelingo')
+    res.send('Welcome to SMIU FYP Backend API');
 });
 
 app.use('/api/admin/', require('./routes/admin'));

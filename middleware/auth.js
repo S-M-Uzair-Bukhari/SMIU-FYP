@@ -1,59 +1,33 @@
 const jwt = require('jsonwebtoken');
+const cloudinaryModule = require("cloudinary");
+const cloudinary = cloudinaryModule.v2;
+const CloudinaryStorage = require("multer-storage-cloudinary");
 const multer = require('multer');
-const { S3Client } = require('@aws-sdk/client-s3')
-const multerS3 = require('multer-s3')
 const path = require('path');
 require('dotenv').config();
 
-const s3 = new S3Client({
-    region: process.env.s3_Region,
-    credentials:{
-        secretAccessKey: process.env.s3_Secret_Key,
-        accessKeyId: process.env.s3_Access_Key
-    }
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
 });
 
-const storage = multerS3({
-    s3: s3,
-    bucket: process.env.s3_Bucket_Name,
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    metadata: function (req, file, cb) {
-      cb(null, {fieldName: file.fieldname});
-    },
-    key: function (req, file, cb) {
-      cb(null, Date.now().toString())
-    }
-  });
-
-  function checkFileType(file, cb) {
-    const filetypes = /jpeg|jpg|png|gif|mp4|mov|png/;
-
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-
-    const mimetype = filetypes.test(file.mimetype);
-    
-
-    if (extname && mimetype) {
-      return cb(null, true);
-    } else {
-      cb('Error: Images only (jpeg, jpg, png, gif, mp4, mov, png)!');
-    }
-  }
-
-// const upload = multer({ 
-//     storage: storage,
-//     fileFilter: function (req, file, cb) {
-//         checkFileType(file, cb);
-//       },
+// const userStorage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, "uploads");
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, Date.now()+ "-" + file.originalname);
+//     }
 // });
 
-const userStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/user");
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now()+ "-" + file.originalname);
-    }
+const userStorage = new CloudinaryStorage({
+  cloudinary: cloudinaryModule,
+  params: {
+    folder: "backend/uploads",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 1024, height: 1024, crop: "limit" }],
+  },
 });
 
 const upload = multer({storage: userStorage});

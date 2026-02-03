@@ -83,12 +83,10 @@ const forgetPassword = async (otp ,currerntPassword) => {
 };
 
 const updateImage = async (req) => {
-    console.log("filename", req.file.fieldname);
-    console.log("file Path", req.file.location);
-    let user = await userModel.findByIdAndUpdate({_id: req.body.id}, 
+    const userId = req.user._id;
+    let user = await userModel.findByIdAndUpdate(userId, 
         { $set: {
-            image: req.file.fieldname,
-            imagePath: req.file.location
+            image: req.file.filename
         }},
         { new: true });
         return user;

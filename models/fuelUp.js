@@ -23,6 +23,9 @@ const feulUpSchema = new Schema({
             require: true
         }
     },
+    stationName: {
+        type: String,
+    },
     date:{
         type: String,
         require: true
